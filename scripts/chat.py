@@ -51,7 +51,6 @@ def print_end_message(token_usage, cost):
     print(f"Prompt: {token_usage['prompt_tokens']}")
     print(f"Completion: {token_usage['completion_tokens']}")
     print(f"Total: {token_usage['total_tokens']}{RESET}")
-    print("")
 
 
 def chat(args, llm):
