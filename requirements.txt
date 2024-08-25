@@ -1,0 +1,6 @@
+openai
+together
+elevenlabs
+boto3
+requests
+pygame
