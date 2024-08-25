@@ -6,9 +6,19 @@ import requests
 from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
 import boto3
-import pygame
+import os
+import sys
 import io
 from botocore.exceptions import BotoCoreError, ClientError
+
+original_stdout = sys.stdout
+sys.stdout = open(os.devnull, 'w')
+
+import pygame
+
+sys.stdout.close()
+sys.stdout = original_stdout
+
 
 pygame.mixer.init()
 

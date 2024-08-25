@@ -5,7 +5,6 @@ import sys
 from scripts.tts import TTSFactory
 from scripts.utils import load_system_prompt
 
-# ANSI codes
 BLACK = "\033[30m"
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -34,16 +33,38 @@ HIDDEN = "\033[8m"
 STRIKETHROUGH = "\033[9m"
 
 
+def print_start_message(llm, args):
+    print("")
+    print(f"{GREEN}Chat Started")
+    print(f"Provider: {args.provider}")
+    print(f"Model: {llm.model}")
+    print(f"Temperature: {llm.temperature}")
+    print(f"Max Tokens: {llm.max_tokens}{RESET}")
+    print("")
+
+
+def print_end_message(token_usage, cost):
+    print("")
+    print(f"{RED}Chat Ended")
+    print(f"Cost: ${cost:.6f}")
+    print(f"Token Usage")
+    print(f"Prompt: {token_usage['prompt_tokens']}")
+    print(f"Completion: {token_usage['completion_tokens']}")
+    print(f"Total: {token_usage['total_tokens']}{RESET}")
+    print("")
+
+
 def chat(args, llm):
-    system_prompt = None
-    if args.system_prompt_file:
-        system_prompt = load_system_prompt(args.system_prompt_file)
+    system_prompt = load_system_prompt()
+
+    if not system_prompt or system_prompt == "":
+        system_prompt = None
 
     tts_provider = None
     if args.tts:
         tts_config = {
-            "api_key": os.environ.get("ELEVEN_API_KEY_TEST"),
-            "region_name": "us-west-2",  # Default region for Amazon Polly
+            "api_key": os.environ.get("ELEVEN_API_KEY"),
+            "region_name": "us-west-2",
             "engine": "neural"
         }
         tts_provider = TTSFactory.create_provider(args.tts, tts_config)
@@ -57,17 +78,17 @@ def chat(args, llm):
         conversation_history.append(
             {"role": "system", "content": system_prompt})
 
-    print(f"\nChat started with {llm.model}\n")
+    print_start_message(llm, args)
 
     while True:
-        user_input = input("")
+        user_input = input(f"")
 
         if user_input.lower() == 'bye':
             break
 
         conversation_history.append({"role": "user", "content": user_input})
 
-        print(f"\n{GREEN}", end="", flush=True)
+        print(f"\n{WHITE}", end="", flush=True)
         if args.stream:
             full_response = ""
             for content, usage in llm.chat_completion_stream(conversation_history):
@@ -84,10 +105,7 @@ def chat(args, llm):
             {"role": "assistant", "content": full_response})
         print(f"{RESET}")  # Extra newline for readability
 
-        # TTS synthesis
         if tts_provider:
-            tts_provider.synthesize(full_response, args.tts_voice)
+            tts_provider.synthesize(full_response, args.voice)
 
-    print("Chat ended. Final statistics:")
-    print(f"Total Token Usage: {llm.get_token_usage()}")
-    print(f"Total Cost: ${llm.get_cost():.6f}")
+    print_end_message(llm.get_token_usage(), llm.get_cost())

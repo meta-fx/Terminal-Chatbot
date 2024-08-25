@@ -2,8 +2,6 @@
 
 import os
 import sys
-import json
-import yaml
 from together import Together
 
 VALID_MODELS = {
@@ -14,29 +12,17 @@ VALID_MODELS = {
 }
 
 
-def load_system_prompt(file_path):
+def load_system_prompt(file_path="system_prompt.txt"):
     _, file_extension = os.path.splitext(file_path)
 
     try:
         with open(file_path, 'r') as file:
             if file_extension == '.txt':
                 return file.read().strip()
-            elif file_extension == '.json':
-                data = json.load(file)
-                return data.get('system_prompt', '')
-            elif file_extension in ['.yml', '.yaml']:
-                data = yaml.safe_load(file)
-                return data.get('system_prompt', '')
             else:
                 raise ValueError(f"Unsupported file format: {file_extension}")
     except FileNotFoundError:
         print(f"Error: System prompt file not found: {file_path}")
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in file: {file_path}")
-        sys.exit(1)
-    except yaml.YAMLError:
-        print(f"Error: Invalid YAML format in file: {file_path}")
         sys.exit(1)
     except IOError:
         print(f"Error: Unable to read system prompt file: {file_path}")
