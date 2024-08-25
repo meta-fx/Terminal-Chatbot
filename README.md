@@ -20,8 +20,7 @@ This project is an simple AI chatbot that can communicate using various Language
 1. Clone this repository:
 
    ```
-   git clone https://github.com/yourusername/ai-chatbot-tts.git
-   cd ai-chatbot-tts
+   git clone https://github.com/meta-fx/Terminal-Chatbot
    ```
 
 2. Install the required packages:
